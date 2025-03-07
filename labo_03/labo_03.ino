@@ -48,9 +48,18 @@ void loop() {
   xValue = analogRead(VRX_PIN);
   yValue = analogRead(VRY_PIN);
 
-  light = analogRead(A0);  // read and save value from PR
+  //light = analogRead(A0);  // read and save value from PR
 
-  int mappedPourcentageLight = map (lightValue, 0, 1023, 0, 100);
+  light = map(analogRead(A0), 0, 1023, 0, 100);
+
+  if(light > 50) { // If it is bright...
+        Serial.println("It  is quite light!");
+        digitalWrite(ledPin, LOW); //turn left LED off
+  }
+  if(light < 50) {
+    Serial.println("It is quite dark!");
+    digitalWrite(ledPin, HIGH);
+  }
 
   int valueButton = digitalRead(pinButton);
     
@@ -71,8 +80,10 @@ void loop() {
       lcd.clear(); // Clear le lcd
       lcd.setCursor(0, 0);
       lcd.print("Pct lum: ");
+      lcd.print(light);
       lcd.setCursor(0, 1);
       lcd.print("Phare: ");
+      lcd.print("ON");
       
   }
   else {
