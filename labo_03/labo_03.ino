@@ -58,16 +58,18 @@ void loop() {
 
   if (millis() == 3000) {
 
-    lcd.print("    Darche"); // You can make spaces using well... spaces
+    lcd.setCursor(4, 0);
+    lcd.print("Darche "); // You can make spaces using well... spaces
     lcd.setCursor(4, 1); // Or setting the cursor in the desired position.
-    lcd.print("60      ");
+    lcd.print("60 ");
+    
 
 
   } // end of if 3s (Darche/60)
 
   if (valueButton == 0) {
-    
-      lcd.setCursor(1, 0);
+      lcd.clear(); // Clear le lcd
+      lcd.setCursor(0, 0);
       lcd.print("Pct lum: ");
       lcd.setCursor(0, 1);
       lcd.print("Phare: ");
