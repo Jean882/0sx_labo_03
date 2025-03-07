@@ -1,5 +1,7 @@
-// LCD
 #include <LCD_I2C.h>
+#include "Button.h"
+
+// LCD
 LCD_I2C lcd(0x27, 16, 2); // Default address of most PCF8574 modules, change according
 
 // LED
@@ -9,12 +11,14 @@ int lightValue = 0;
 int mappedPourcentageLight = 0;
 
 // Joystick/Button
-#define BTN_PIN 2
+#define BTN_PIN 2;
 #define VRX_PIN  A3 // Broche Arduino connectée à la broche VRX
 #define VRY_PIN  A4 // Broche Arduino connectée à la broche VRY
 int xValue = 0; // Pour stocker la valeur de l'axe X
 int yValue = 0; // Pour stocker la valeur de l'axe Y
-int pinButton = 8;
+
+int pinButton = 3;
+
 
 
 // Time
@@ -58,13 +62,21 @@ void loop() {
     lcd.setCursor(4, 1); // Or setting the cursor in the desired position.
     lcd.print("60      ");
 
-    //switch(currentState) {
-      //case PAGE1:
-
-    //}
 
   } // end of if 3s (Darche/60)
 
+  if (valueButton == 0) {
+    
+      lcd.setCursor(1, 0);
+      lcd.print("Pct lum: ");
+      lcd.setCursor(0, 1);
+      lcd.print("Phare: ");
+      
+  }
+  else {
+    
+    valueButton == 1; 
+  }
   
 
 
