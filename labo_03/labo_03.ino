@@ -18,6 +18,9 @@ int xValue = 0; // Pour stocker la valeur de l'axe X
 int yValue = 0; // Pour stocker la valeur de l'axe Y
 
 int pinButton = 3;
+int buttonState = 0;
+
+
 
 
 
@@ -27,13 +30,6 @@ unsigned long previousTime = 0;
 int interval = 1000;
 const int timePassed = 5000;
 unsigned long start;
-
-// State
-enum AppState { PAGE1,
-                SECOND,
-                THIRD,
-                FOURTH };
-AppState currentState = PAGE1;
 
 void setup() {
 
@@ -47,30 +43,14 @@ void setup() {
 
 void loop() {
   currentTime = millis();
+  static int counter = 0;
   
 
   xValue = analogRead(VRX_PIN);
   yValue = analogRead(VRY_PIN);
 
-  //light = analogRead(A0);  // read and save value from PR
-
-  light = map(analogRead(A0), 0, 1023, 0, 100);
-
-  if(light > 50 && (millis() - start) >= timePassed) { // If it is bright...
-        Serial.println("It  is quite light!");
-        digitalWrite(ledPin, LOW); //turn left LED off
-        start = millis();
-  }
-  if(light < 50 && (millis() - start) >= timePassed) {
-    Serial.println("It is quite dark!");
-    digitalWrite(ledPin, HIGH);
-    start = millis();
-  }
-
-  int valueButton = digitalRead(pinButton);
-    
-  //Serial.println(light); // print current  light value
-
+  buttonState = digitalRead(pinButton);
+  
   if (millis() == 3000) {
 
     lcd.setCursor(4, 0);
@@ -82,21 +62,69 @@ void loop() {
 
   } // end of if 3s (Darche/60)
 
+  light = map(analogRead(A0), 0, 1023, 0, 100);
 
-    if (valueButton == 0) {
-        lcd.clear(); // Clear le lcd
-        lcd.setCursor(0, 0);
-        lcd.print("Pct lum: ");
-        lcd.print(light);
-        lcd.setCursor(0, 1);
-        lcd.print("Phare: ");
-        lcd.print("ON");
-        
-    }
-    else {
+
+  if(light > 50 && (millis() - start) >= timePassed) { // If it is bright...
+        Serial.println("It  is quite light!");
+        digitalWrite(ledPin, LOW); //turn left LED off
+        start = millis();
+  } // end of if light
+
+  if(light < 50 && (millis() - start) >= timePassed) {
+    Serial.println("It is quite dark!");
+    digitalWrite(ledPin, HIGH);
+    start = millis();
+  } // end of if dark
+
+
+  int valueButton = digitalRead(pinButton);
+
+  
+
+
+  if (valueButton == 0) {
+      lcd.clear(); // Clear le lcd
+      lcd.setCursor(0, 0);
+      lcd.print("Pct lum: ");
+      lcd.print(light);
+      lcd.setCursor(0, 1);
+      lcd.print("Phare: ");
+      lcd.print("ON");
       
-      valueButton == 1; 
+    counter++;
+  }
+  
+
+  if (counter == 1) {
+
+    Serial.print("x = ");
+    Serial.print(xValue);
+    Serial.print(" | y = ");
+    Serial.println(yValue);
+
+    if (yValue > 498) {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Avance!");
     }
+    if (yValue < 498) {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.println("Recule!");
+    }
+    if (xValue > 510) {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.println("Turn Left");
+    }
+    if (xValue < 510) {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.println("Turn Right");
+    }
+    counter = 0;
+  }
   
 
 
