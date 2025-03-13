@@ -11,14 +11,16 @@ int lightValue = 0;
 int mappedPourcentageLight = 0;
 
 // Joystick/Button
-#define BTN_PIN 2;
-#define VRX_PIN  A3 // Broche Arduino connectée à la broche VRX
-#define VRY_PIN  A4 // Broche Arduino connectée à la broche VRY
+#define BTN_PIN 2
+#define VRX_PIN  A1 // Broche Arduino connectée à la broche VRX
+#define VRY_PIN  A2 // Broche Arduino connectée à la broche VRY
 int xValue = 0; // Pour stocker la valeur de l'axe X
 int yValue = 0; // Pour stocker la valeur de l'axe Y
 
-int pinButton = 3;
+
 int buttonState = 0;
+
+byte DA[8] = {B11100, B10000, B11100, B10100, B11111, B00101, B00101, B00111};
 
 
 
@@ -37,9 +39,38 @@ void setup() {
   pinMode(ledPin, OUTPUT);
   lcd.begin();
   lcd.backlight();
-  pinMode(pinButton, INPUT_PULLUP);
+  pinMode(BTN_PIN, INPUT_PULLUP);
   start = millis();
+  lcd.createChar(0,DA);
+
 } // end of setup
+
+
+int estClic(unsigned long ct) {
+  static unsigned long lastTime = 0;
+  static int lastState = HIGH;
+  const int rate = 50;
+  int clic = 0;
+
+  if (ct - lastTime < rate) {
+    return clic; // Trop rapide
+  }
+
+  lastTime = ct;
+
+  int state = digitalRead(BTN_PIN);
+
+  if (state == LOW) {
+    if (lastState == HIGH) {
+      clic = !clic;
+    }
+  }
+
+  lastState = state;
+
+  return clic;
+}
+
 
 void loop() {
   currentTime = millis();
@@ -49,14 +80,15 @@ void loop() {
   xValue = analogRead(VRX_PIN);
   yValue = analogRead(VRY_PIN);
 
-  buttonState = digitalRead(pinButton);
+  buttonState = digitalRead(BTN_PIN);
   
-  if (millis() == 3000) {
+  while (millis() <= 3000) {
 
-    lcd.setCursor(4, 0);
+    lcd.setCursor(0, 0);
     lcd.print("Darche "); // You can make spaces using well... spaces
-    lcd.setCursor(4, 1); // Or setting the cursor in the desired position.
-    lcd.print("60 ");
+    lcd.setCursor(0, 1); // Or setting the cursor in the desired position.
+    lcd.write(byte(0));
+    delay(3000);
     
 
 
@@ -78,7 +110,7 @@ void loop() {
   } // end of if dark
 
 
-  int valueButton = digitalRead(pinButton);
+  int valueButton = digitalRead(BTN_PIN);
 
   
 
@@ -92,11 +124,11 @@ void loop() {
       lcd.print("Phare: ");
       lcd.print("ON");
       
-    counter++;
+   
   }
   
 
-  if (counter == 1) {
+  if (counter) {
 
     Serial.print("x = ");
     Serial.print(xValue);
