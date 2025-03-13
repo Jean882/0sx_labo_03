@@ -16,9 +16,16 @@ int mappedPourcentageLight = 0;
 #define VRY_PIN  A2 // Broche Arduino connectée à la broche VRY
 int xValue = 0; // Pour stocker la valeur de l'axe X
 int yValue = 0; // Pour stocker la valeur de l'axe Y
+int speedStart = 0;
+int speedActual =0;
+int speedY = 0;
+int speedX = 0;
 
+
+// DA student
 byte DA[8] = {B11100, B10000, B11100, B10100, B11111, B00101, B00101, B00111};
 
+// time
 unsigned long currentTime = 0;
 unsigned long previousTime = 0;
 int interval = 1000;
@@ -34,14 +41,14 @@ void setup() {
   pinMode(BTN_PIN, INPUT_PULLUP);
   start = millis();
   lcd.createChar(0,DA);
+  speedStart = 1023 - analogRead(VRY_PIN);
 
 } // end of setup
 
 void loop() {
   currentTime = millis();  
 
-  xValue = analogRead(VRX_PIN);
-  yValue = analogRead(VRY_PIN);
+  
   
   while (millis() <= 3000) {
 
@@ -54,6 +61,9 @@ void loop() {
   } // (Darche/60)
 
   light = map(analogRead(A0), 0, 1023, 0, 100);
+  speedActual = 1023 - analogRead(VRY_PIN);
+
+  
 
   if (estClic(currentTime)) {
 
@@ -89,7 +99,7 @@ int estClic(unsigned long ct) {
   lastState = state;
 
   return clic;
-}
+} // end of estClic
 
 void lightTask(unsigned long ct) {
 
@@ -122,9 +132,28 @@ void lightTask(unsigned long ct) {
     
     lcd.print("ON ");
   }
-}
+} // end of lightTask
 
 void driveTask() {
+
+  xValue = analogRead(VRX_PIN);
+  yValue = analogRead(VRY_PIN);
+  
+
+  if (speedActual > speedStart) {
+
+    speedY = map(speedActual, speedStart, 1023, 0, 120);
+
+  } else if(speedActual < speedStart) {
+
+    speedY = map(speedActual, 0, speedStart, -25, 0);
+
+  } else if (speedActual == speedStart) {
+
+    speedY = map(speedActual, speedStart, 0, 0, 0);
+  }
+
+
 
   Serial.print("x = ");
   Serial.print(xValue);
@@ -136,15 +165,20 @@ void driveTask() {
   lcd.setCursor(0, 1);
   lcd.print("Direction:          ");
 
-  if (yValue > 498) {
-    
-    
-  }
+  if (speedY > 0) {
+    lcd.setCursor(9, 0);
+    lcd.print(speedY);
 
-  if (yValue < 498) {
-    
+  } else if (speedY < 0) {
+    lcd.setCursor(9, 0);
+    lcd.print(speedY); 
+
+  } else if (speedY == 0) {
+    lcd.setCursor(9, 0);
+    lcd.print(speedY);
     
   }
+  
   if (xValue > 510) {
     
     
@@ -153,7 +187,7 @@ void driveTask() {
   if (xValue < 510) {
     
   }
-}
+} // end of driveTask
 
 
 
