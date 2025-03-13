@@ -17,16 +17,8 @@ int mappedPourcentageLight = 0;
 int xValue = 0; // Pour stocker la valeur de l'axe X
 int yValue = 0; // Pour stocker la valeur de l'axe Y
 
-
-int buttonState = 0;
-
 byte DA[8] = {B11100, B10000, B11100, B10100, B11111, B00101, B00101, B00111};
 
-
-
-
-
-// Time
 unsigned long currentTime = 0;
 unsigned long previousTime = 0;
 int interval = 1000;
@@ -45,12 +37,40 @@ void setup() {
 
 } // end of setup
 
+void loop() {
+  currentTime = millis();  
+
+  xValue = analogRead(VRX_PIN);
+  yValue = analogRead(VRY_PIN);
+  
+  while (millis() <= 3000) {
+
+    lcd.setCursor(0, 0);
+    lcd.print("Darche "); // You can make spaces using well... spaces
+    lcd.setCursor(0, 1); // Or setting the cursor in the desired position.
+    lcd.write(byte(0));
+    delay(3000);
+
+  } // (Darche/60)
+
+  light = map(analogRead(A0), 0, 1023, 0, 100);
+
+  if (estClic(currentTime)) {
+
+    driveTask();
+  } else {
+
+    lightTask(currentTime);
+  }
+
+    
+} // end of loop
 
 int estClic(unsigned long ct) {
   static unsigned long lastTime = 0;
   static int lastState = HIGH;
   const int rate = 50;
-  int clic = 0;
+  static int clic = 0;
 
   if (ct - lastTime < rate) {
     return clic; // Trop rapide
@@ -61,7 +81,7 @@ int estClic(unsigned long ct) {
   int state = digitalRead(BTN_PIN);
 
   if (state == LOW) {
-    if (lastState == HIGH) {
+    if (state != lastState) {
       clic = !clic;
     }
   }
@@ -71,101 +91,69 @@ int estClic(unsigned long ct) {
   return clic;
 }
 
+void lightTask(unsigned long ct) {
 
-void loop() {
-  currentTime = millis();
-  static int counter = 0;
+  static int ledState = LOW;
   
-
-  xValue = analogRead(VRX_PIN);
-  yValue = analogRead(VRY_PIN);
-
-  buttonState = digitalRead(BTN_PIN);
-  
-  while (millis() <= 3000) {
-
-    lcd.setCursor(0, 0);
-    lcd.print("Darche "); // You can make spaces using well... spaces
-    lcd.setCursor(0, 1); // Or setting the cursor in the desired position.
-    lcd.write(byte(0));
-    delay(3000);
-    
-
-
-  } // end of if 3s (Darche/60)
-
-  light = map(analogRead(A0), 0, 1023, 0, 100);
-
+  lcd.setCursor(0, 0);
+  lcd.print("Pct lum: ");
+  lcd.print(light);
+  lcd.setCursor(0, 1);
+  lcd.print("Phare: ");
 
   if(light > 50 && (millis() - start) >= timePassed) { // If it is bright...
-        Serial.println("It  is quite light!");
-        digitalWrite(ledPin, LOW); //turn left LED off
-        start = millis();
+    Serial.println("It  is quite light!");
+    ledState = LOW;
+    digitalWrite(ledPin, ledState); //turn left LED off
+    start = millis();
   } // end of if light
 
   if(light < 50 && (millis() - start) >= timePassed) {
     Serial.println("It is quite dark!");
-    digitalWrite(ledPin, HIGH);
+    ledState = HIGH;
+    digitalWrite(ledPin, ledState);
     start = millis();
   } // end of if dark
 
-
-  int valueButton = digitalRead(BTN_PIN);
-
-  
-
-
-  if (valueButton == 0) {
-      lcd.clear(); // Clear le lcd
-      lcd.setCursor(0, 0);
-      lcd.print("Pct lum: ");
-      lcd.print(light);
-      lcd.setCursor(0, 1);
-      lcd.print("Phare: ");
-      lcd.print("ON");
-      
-   
-  }
-  
-
-  if (counter) {
-
-    Serial.print("x = ");
-    Serial.print(xValue);
-    Serial.print(" | y = ");
-    Serial.println(yValue);
-
-    if (yValue > 498) {
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("Avance!");
-    }
-    if (yValue < 498) {
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.println("Recule!");
-    }
-    if (xValue > 510) {
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.println("Turn Left");
-    }
-    if (xValue < 510) {
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.println("Turn Right");
-    }
-    counter = 0;
-  }
-  
-
-
-
-
-
-
+  if (!ledState) {
     
-} // end of loop
+    lcd.print("OFF");
+  } else {
+    
+    lcd.print("ON ");
+  }
+}
+
+void driveTask() {
+
+  Serial.print("x = ");
+  Serial.print(xValue);
+  Serial.print(" | y = ");
+  Serial.println(yValue);
+  
+  lcd.setCursor(0, 0);
+  lcd.print("Vitesse:            ");
+  lcd.setCursor(0, 1);
+  lcd.print("Direction:          ");
+
+  if (yValue > 498) {
+    
+    
+  }
+
+  if (yValue < 498) {
+    
+    
+  }
+  if (xValue > 510) {
+    
+    
+    
+  }
+  if (xValue < 510) {
+    
+  }
+}
 
 
 
