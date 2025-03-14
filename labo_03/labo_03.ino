@@ -10,6 +10,7 @@ int light = 0; // store the current light value
 int lightValue = 0;
 int mappedPourcentageLight = 0;
 
+
 // Joystick/Button
 #define BTN_PIN 2
 #define VRX_PIN  A1 // Broche Arduino connectée à la broche VRX
@@ -17,9 +18,14 @@ int mappedPourcentageLight = 0;
 int xValue = 0; // Pour stocker la valeur de l'axe X
 int yValue = 0; // Pour stocker la valeur de l'axe Y
 int speedStart = 0;
-int speedActual =0;
+int speedActual = 0;
+int speedActualX = 0;
 int speedY = 0;
 int speedX = 0;
+int maxSpeed = 120;
+int minSpeed = -25;
+int leftDirection = -90;
+int rightDirection = 90;
 
 
 // DA student
@@ -62,7 +68,16 @@ void loop() {
 
   light = map(analogRead(A0), 0, 1023, 0, 100);
   speedActual = 1023 - analogRead(VRY_PIN);
+  
+  if (millis() == 100) {
 
+    Serial.print("etd:2206160");
+    Serial.print(",x:");
+    Serial.print(xValue);
+    Serial.print(",y:");
+    Serial.println(yValue);
+
+  }
   
 
   if (estClic(currentTime)) {
@@ -113,14 +128,14 @@ void lightTask(unsigned long ct) {
   lcd.print("Phares: ");
 
   if(light > 50 && (millis() - start) >= timePassed) { // If it is bright...
-    Serial.println("It  is quite light!");
+   
     ledState = LOW;
     digitalWrite(ledPin, ledState); //turn left LED off
     start = millis();
   } // end of if light
 
   if(light < 50 && (millis() - start) >= timePassed) {
-    Serial.println("It is quite dark!");
+  
     ledState = HIGH;
     digitalWrite(ledPin, ledState);
     start = millis();
@@ -143,25 +158,21 @@ void driveTask() {
 
   if (speedActual > speedStart) {
 
-    speedY = map(speedActual, speedStart, 1023, 0, 120);
+    speedY = map(speedActual, speedStart, 1023, 0, maxSpeed);
 
   } else if(speedActual < speedStart) {
 
-    speedY = map(speedActual, 0, speedStart, -25, 0);
+    speedY = map(speedActual, 0, speedStart, minSpeed, 0);
 
   } else if (speedActual == speedStart) {
 
     speedY = map(speedActual, speedStart, 0, 0, 0);
   }
 
-  speedX = map(analogRead(VRX_PIN), 0, 1023, -90, 90);
+  speedX = map(xValue, 0, 1023, leftDirection, rightDirection);
 
 
-
-  Serial.print("x = ");
-  Serial.print(xValue);
-  Serial.print(" | y = ");
-  Serial.println(yValue);
+  
   
   lcd.setCursor(0, 0);
   lcd.print("Vitesse:            ");
@@ -173,30 +184,36 @@ void driveTask() {
     lcd.print(speedY);
     lcd.print("km/h");
     lcd.setCursor(11, 1);
-    lcd.print("^        ");
+    
 
   } else if (speedY < 0) {
     lcd.setCursor(9, 0);
     lcd.print(speedY);
     lcd.print("km/h");
     lcd.setCursor(11, 1);
-    lcd.print("|"        );
+    
 
   } else if (speedY == 0) {
     lcd.setCursor(9, 0);
     lcd.print(speedY);
     lcd.print("km/h");
     lcd.setCursor(11, 1);
-    lcd.print("none      ");
+    lcd.print("none       ");
   }
   
-  if (speedX < 0) {
+  if (speedX < -5) {
     
+    lcd.setCursor(11, 1);
+    lcd.print("left        ");
+  } else if (speedX > 5) {
     
-  } else if (speedX > 0) {
-    
-    
-  } 
+    lcd.setCursor(11, 1);
+    lcd.print("right       ");
+  } else {
+
+    lcd.setCursor(11, 1);
+    lcd.print("none       ");
+  }
 
   
 } // end of driveTask
