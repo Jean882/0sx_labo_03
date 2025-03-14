@@ -54,6 +54,8 @@ void setup() {
 void loop() {
   currentTime = millis();  
 
+  
+
   if(currentTime - previousTime >= interval){
       previousTime = currentTime;
 
@@ -64,7 +66,7 @@ void loop() {
     Serial.print(yValue);
     Serial.print(",sys:");
     Serial.println(light);
-  }
+  } // end of 100s etd
   
   while (millis() <= 3000) {
 
@@ -72,9 +74,10 @@ void loop() {
     lcd.print("Darche "); // You can make spaces using well... spaces
     lcd.setCursor(0, 1); // Or setting the cursor in the desired position.
     lcd.write(byte(0));
+    lcd.print((char)223);
     delay(3000);
 
-  } // (Darche/60)
+  } // end of while (Darche/60)
 
   light = map(analogRead(A0), 0, 1023, 0, 100);
   speedActual = 1023 - analogRead(VRY_PIN); 
@@ -88,7 +91,7 @@ void loop() {
   }
 
     
-} // end of loop
+} // end of main loop
 
 int estClic(unsigned long ct) {
   static unsigned long lastTime = 0;
