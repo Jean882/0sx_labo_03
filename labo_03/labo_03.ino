@@ -34,7 +34,7 @@ byte DA[8] = {B11100, B10000, B11100, B10100, B11111, B00101, B00101, B00111};
 // time
 unsigned long currentTime = 0;
 unsigned long previousTime = 0;
-int interval = 1000;
+int interval = 100;
 const int timePassed = 5000;
 unsigned long start;
 
@@ -54,7 +54,17 @@ void setup() {
 void loop() {
   currentTime = millis();  
 
-  
+  if(currentTime - previousTime >= interval){
+      previousTime = currentTime;
+
+    Serial.print("etd:2206160");
+    Serial.print(",x:");
+    Serial.print(xValue);
+    Serial.print(",y:");
+    Serial.print(yValue);
+    Serial.print(",sys:");
+    Serial.println(light);
+  }
   
   while (millis() <= 3000) {
 
@@ -67,18 +77,7 @@ void loop() {
   } // (Darche/60)
 
   light = map(analogRead(A0), 0, 1023, 0, 100);
-  speedActual = 1023 - analogRead(VRY_PIN);
-  
-  if (millis() == 100) {
-
-    Serial.print("etd:2206160");
-    Serial.print(",x:");
-    Serial.print(xValue);
-    Serial.print(",y:");
-    Serial.println(yValue);
-
-  }
-  
+  speedActual = 1023 - analogRead(VRY_PIN); 
 
   if (estClic(currentTime)) {
 
