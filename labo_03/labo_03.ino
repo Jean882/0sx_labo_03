@@ -102,14 +102,15 @@ int estClic(unsigned long ct) {
 } // end of estClic
 
 void lightTask(unsigned long ct) {
-
+  
   static int ledState = LOW;
   
   lcd.setCursor(0, 0);
   lcd.print("Pct lum: ");
   lcd.print(light);
+  lcd.print("%");
   lcd.setCursor(0, 1);
-  lcd.print("Phare: ");
+  lcd.print("Phares: ");
 
   if(light > 50 && (millis() - start) >= timePassed) { // If it is bright...
     Serial.println("It  is quite light!");
@@ -127,15 +128,15 @@ void lightTask(unsigned long ct) {
 
   if (!ledState) {
     
-    lcd.print("OFF");
+    lcd.print("OFF      ");
   } else {
     
-    lcd.print("ON ");
+    lcd.print("ON       ");
   }
 } // end of lightTask
 
 void driveTask() {
-
+  
   xValue = analogRead(VRX_PIN);
   yValue = analogRead(VRY_PIN);
   
@@ -153,6 +154,8 @@ void driveTask() {
     speedY = map(speedActual, speedStart, 0, 0, 0);
   }
 
+  speedX = map(analogRead(VRX_PIN), 0, 1023, -90, 90);
+
 
 
   Serial.print("x = ");
@@ -168,25 +171,34 @@ void driveTask() {
   if (speedY > 0) {
     lcd.setCursor(9, 0);
     lcd.print(speedY);
+    lcd.print("km/h");
+    lcd.setCursor(11, 1);
+    lcd.print("^        ");
 
   } else if (speedY < 0) {
     lcd.setCursor(9, 0);
-    lcd.print(speedY); 
+    lcd.print(speedY);
+    lcd.print("km/h");
+    lcd.setCursor(11, 1);
+    lcd.print("|"        );
 
   } else if (speedY == 0) {
     lcd.setCursor(9, 0);
     lcd.print(speedY);
-    
+    lcd.print("km/h");
+    lcd.setCursor(11, 1);
+    lcd.print("none      ");
   }
   
-  if (xValue > 510) {
+  if (speedX < 0) {
     
     
+  } else if (speedX > 0) {
     
-  }
-  if (xValue < 510) {
     
-  }
+  } 
+
+  
 } // end of driveTask
 
 
