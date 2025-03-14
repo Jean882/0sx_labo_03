@@ -90,6 +90,8 @@ void loop() {
     lightTask(currentTime);
   }
 
+
+  
     
 } // end of main loop
 
@@ -125,7 +127,7 @@ void lightTask(unsigned long ct) {
   lcd.setCursor(0, 0);
   lcd.print("Pct lum: ");
   lcd.print(light);
-  lcd.print("%");
+  lcd.print("%        ");
   lcd.setCursor(0, 1);
   lcd.print("Phares: ");
 
